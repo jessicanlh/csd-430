@@ -1,7 +1,6 @@
 <%--
- jessica long-heinicke 6.22.25 csd 430
- update 7.6.25
- select entries in database
+Jessica Long-Heinicke 7.6.25 csd 430
+
 --%>
 <%@ page import="beans.MovieBean" %>
 <%@ page import="java.util.List" %>
@@ -9,7 +8,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Select Movie</title>
+  <title>Select Movie to Update</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 40px; }
     .container { max-width: 600px; margin: 0 auto; }
@@ -28,34 +27,34 @@
       cursor: pointer;
     }
     button:hover { background: #2980b9; }
-    .error { color: red; }
+    .back-link { display: inline-block; margin-top: 20px; }
   </style>
 </head>
 <body>
 <div class="container">
-  <h1>Movie Selection</h1>
-  <p>Select a movie from the dropdown to view details:</p>
+  <h1>Update Movie Record</h1>
+  <p>Select a movie to update from the dropdown:</p>
 
   <%
     List<MovieBean> movies = MovieBean.getAllMovies();
     if (movies.isEmpty()) {
   %>
-  <p class="error">No movies found in database!</p>
+  <p>No movies found in database!</p>
   <a href="index.jsp">Return to Home</a>
   <% } else { %>
-  <form action="display.jsp" method="GET">
+  <form action="update_form.jsp" method="GET">
     <select name="movieId" required>
       <option value="">-- Select Movie --</option>
       <% for (MovieBean movie : movies) { %>
       <option value="<%= movie.getMovieId() %>">
-        <%= movie.getTitle() %> (<%= movie.getReleaseYear() %>)
+        <%= movie.getTitle() %> (ID: <%= movie.getMovieId() %>)
       </option>
       <% } %>
     </select>
-    <button type="submit">View Details</button>
+    <button type="submit">Select Movie</button>
   </form>
   <% } %>
-  <a href="index.jsp">Back to Home</a>
+  <a href="index.jsp" class="back-link">Back to Home</a>
 </div>
 </body>
 </html>

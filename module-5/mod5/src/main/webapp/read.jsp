@@ -1,48 +1,86 @@
 <%--
   jessica long-heinicke 6.22.25 csd  430
+  update 7.6.25
 --%>
-<<%@ page import="util.DBConnection" %>
-<%@ page import="java.sql.*" %>
+<%@ page import="beans.MovieBean" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>View Movies</title>
+    <title>All Movies</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { color: #2c3e50; }
+        .back-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        tr:hover { background-color: #f1f5f9; }
+    </style>
 </head>
 <body>
-<h1>Movie List</h1>
-<a href="index.jsp">Home</a>
-<table border="1">
-    <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Director</th>
-        <th>Year</th>
-        <th>Genre</th>
-        <th>Rating</th>
-    </tr>
-    <%
-        try (Connection conn = DBConnection.getConnection();
-             Statement stmt = conn.createStatement()) {
+<div class="container">
+    <a href="index.jsp" class="back-btn">Home</a>
+    <h1>All Movies in Database</h1>
 
-            ResultSet rs = stmt.executeQuery("SELECT * FROM jessica_movies_data");
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Director</th>
+            <th>Year</th>
+            <th>Genre</th>
+            <th>Rating</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%
+            List<MovieBean> movies = MovieBean.getAllMovies();
+            for (MovieBean movie : movies) {
+        %>
+        <tr>
+            <td><%= movie.getMovieId() %></td>
+            <td><%= movie.getTitle() %></td>
+            <td><%= movie.getDirector() %></td>
+            <td><%= movie.getReleaseYear() %></td>
+            <td><%= movie.getGenre() %></td>
+            <td><%= String.format("%.1f", movie.getRating()) %></td>
+        </tr>
+        <% } %>
+        </tbody>
+    </table>
 
-            while (rs.next()) {
-    %>
-    <tr>
-        <td><%= rs.getInt("movie_id") %></td>
-        <td><%= rs.getString("title") %></td>
-        <td><%= rs.getString("director") %></td>
-        <td><%= rs.getInt("release_year") %></td>
-        <td><%= rs.getString("genre") %></td>
-        <td><%= rs.getDouble("rating") %></td>
-    </tr>
-    <%
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    %>
-</table>
+    <div class="data-info">
+        <h2>Database Information</h2>
+        <p>Total movies: <strong><%= movies.size() %></strong></p>
+        <p>Table name: <code>jessica_movies_data</code></p>
+        <p>Database: <code>CSD430</code></p>
+        <p>User: <code>student1@localhost</code></p>
+    </div>
+</div>
 </body>
 </html>

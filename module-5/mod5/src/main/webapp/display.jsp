@@ -1,17 +1,27 @@
 <%--
  jessica long-heinicke 6.22.25 csd 430
+ update 7.6.25
+ display entries
 --%>
-<%@ page import="beans.Movie" %>
+<%@ page import="beans.MovieBean" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
   int movieId = 0;
+  String error = null;
+
   try {
     movieId = Integer.parseInt(request.getParameter("movieId"));
   } catch (NumberFormatException e) {
-    // Handle error
+    error = "Invalid movie ID format";
   }
 
-  Movie movie = Movie.getMovieById(movieId);
+  MovieBean movie = null;
+  if (error == null) {
+    movie = MovieBean.getMovieById(movieId);
+    if (movie.getTitle() == null) {
+      error = "No movie found with ID: " + movieId;
+    }
+  }
 %>
 <!DOCTYPE html>
 <html>
@@ -20,7 +30,6 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 40px; }
     .container { max-width: 800px; margin: 0 auto; }
-    h1 { color: #2c3e50; }
     .back-btn {
       display: inline-block;
       padding: 8px 15px;
@@ -29,6 +38,7 @@
       text-decoration: none;
       margin-bottom: 20px;
     }
+    .error { color: red; }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -42,57 +52,54 @@
     th {
       background-color: #f2f2f2;
       font-weight: bold;
+      width: 30%;
     }
-    tr:hover { background-color: #f5f5f5; }
   </style>
 </head>
 <body>
 <div class="container">
   <a href="select.jsp" class="back-btn">&laquo; Back to Selection</a>
-  <h1>Movie Details</h1>
 
-  <% if (movie.getTitle() != null) { %>
+  <% if (error != null) { %>
+  <h1>Error</h1>
+  <p class="error"><%= error %></p>
+  <% } else { %>
+  <h1>Movie Details: <%= movie.getTitle() %></h1>
   <table>
-    <thead>
     <tr>
-      <th>Field</th>
-      <th>Value</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-      <td>Movie ID</td>
+      <th>Movie ID</th>
       <td><%= movie.getMovieId() %></td>
     </tr>
     <tr>
-      <td>Title</td>
+      <th>Title</th>
       <td><%= movie.getTitle() %></td>
     </tr>
     <tr>
-      <td>Director</td>
+      <th>Director</th>
       <td><%= movie.getDirector() %></td>
     </tr>
     <tr>
-      <td>Release Year</td>
+      <th>Release Year</th>
       <td><%= movie.getReleaseYear() %></td>
     </tr>
     <tr>
-      <td>Genre</td>
+      <th>Genre</th>
       <td><%= movie.getGenre() %></td>
     </tr>
     <tr>
-      <td>Rating</td>
-      <td><%= String.format("%.1f", movie.getRating()) %></td>
+      <th>Rating</th>
+      <td><%= String.format("%.1f", movie.getRating()) %>/10</td>
     </tr>
-    </tbody>
   </table>
-  <% } else { %>
-  <p>No movie found with ID: <%= movieId %></p>
-  <% } %>
 
-  <h2>About This Record</h2>
-  <p>This record shows complete details for the selected movie from our database.
-    The information includes both identification data and artistic attributes.</p>
+  <div class="record-info">
+    <h2>About This Record</h2>
+    <p>This record shows complete details for the selected movie from our database.
+      The information is stored in our MySQL database under the table
+      <code>jessica_movies_data</code> and was retrieved using a JavaBean
+      with JDBC database connectivity.</p>
+  </div>
+  <% } %>
 </div>
 </body>
 </html>
