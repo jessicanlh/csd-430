@@ -19,17 +19,40 @@ public class MovieBean {
 
     // Getters and Setters
     public int getMovieId() { return movieId; }
-    public void setMovieId(int movieId) { this.movieId = movieId; }
+    public void setMovieId(int movieId) {
+        System.out.println("Setting movieId: " + movieId);
+        this.movieId = movieId;
+    }
+
     public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public void setTitle(String title) {
+        System.out.println("Setting title: " + title);
+        this.title = title;
+    }
+
     public String getDirector() { return director; }
-    public void setDirector(String director) { this.director = director; }
+    public void setDirector(String director) {
+        System.out.println("Setting director: " + director);
+        this.director = director;
+    }
+
     public int getReleaseYear() { return releaseYear; }
-    public void setReleaseYear(int releaseYear) { this.releaseYear = releaseYear; }
+    public void setReleaseYear(int releaseYear) {
+        System.out.println("Setting releaseYear: " + releaseYear);
+        this.releaseYear = releaseYear;
+    }
+
     public String getGenre() { return genre; }
-    public void setGenre(String genre) { this.genre = genre; }
+    public void setGenre(String genre) {
+        System.out.println("Setting genre: " + genre);
+        this.genre = genre;
+    }
+
     public double getRating() { return rating; }
-    public void setRating(double rating) { this.rating = rating; }
+    public void setRating(double rating) {
+        System.out.println("Setting rating: " + rating);
+        this.rating = rating;
+    }
 
     // Insert movie into database
     public boolean insert() {
@@ -46,9 +69,11 @@ public class MovieBean {
             pstmt.setDouble(5, this.rating);
 
             int rowsAffected = pstmt.executeUpdate();
+            System.out.println("INSERT: Rows affected - " + rowsAffected);
             return rowsAffected > 0;
 
         } catch (SQLException e) {
+            System.err.println("INSERT ERROR: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -74,7 +99,9 @@ public class MovieBean {
                 movie.setRating(rs.getDouble("rating"));
                 movies.add(movie);
             }
+            System.out.println("GET ALL: Found " + movies.size() + " movies");
         } catch (SQLException e) {
+            System.err.println("GET ALL ERROR: " + e.getMessage());
             e.printStackTrace();
         }
         return movies;
@@ -98,21 +125,34 @@ public class MovieBean {
                     movie.setReleaseYear(rs.getInt("release_year"));
                     movie.setGenre(rs.getString("genre"));
                     movie.setRating(rs.getDouble("rating"));
+                    System.out.println("GET BY ID: Found movie - " + movie.getTitle());
+                } else {
+                    System.out.println("GET BY ID: No movie found for ID " + id);
                 }
             }
         } catch (SQLException e) {
+            System.err.println("GET BY ID ERROR: " + e.getMessage());
             e.printStackTrace();
         }
         return movie;
     }
 
-    // Update movie
+    // Update movie - DEBUGGED VERSION
     public boolean update() {
         String sql = "UPDATE jessica_movies_data SET title = ?, director = ?, release_year = ?, genre = ?, rating = ? WHERE movie_id = ?";
 
         try (Connection conn = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/CSD430", "student1", "pass");
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            // Debug parameters before execution
+            System.out.println("UPDATE PARAMS:");
+            System.out.println("1. Title: " + this.title);
+            System.out.println("2. Director: " + this.director);
+            System.out.println("3. Year: " + this.releaseYear);
+            System.out.println("4. Genre: " + this.genre);
+            System.out.println("5. Rating: " + this.rating);
+            System.out.println("6. Movie ID: " + this.movieId);
 
             pstmt.setString(1, this.title);
             pstmt.setString(2, this.director);
@@ -122,9 +162,15 @@ public class MovieBean {
             pstmt.setInt(6, this.movieId);
 
             int rowsAffected = pstmt.executeUpdate();
+            System.out.println("UPDATE: Rows affected - " + rowsAffected);
+
+            // Additional debug - show generated SQL
+            System.out.println("EXECUTED SQL: " + pstmt.toString());
+
             return rowsAffected > 0;
 
         } catch (SQLException e) {
+            System.err.println("UPDATE ERROR: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -140,9 +186,11 @@ public class MovieBean {
 
             pstmt.setInt(1, movieId);
             int rowsAffected = pstmt.executeUpdate();
+            System.out.println("DELETE: Rows affected - " + rowsAffected);
             return rowsAffected > 0;
 
         } catch (SQLException e) {
+            System.err.println("DELETE ERROR: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -161,9 +209,19 @@ public class MovieBean {
             while (rs.next()) {
                 movieIds.add(rs.getInt("movie_id"));
             }
+            System.out.println("GET IDs: Found " + movieIds.size() + " movie IDs");
         } catch (SQLException e) {
+            System.err.println("GET IDs ERROR: " + e.getMessage());
             e.printStackTrace();
         }
         return movieIds;
+    }
+
+    // Debug method to show current state
+    public String debugString() {
+        return String.format(
+                "MovieBean [id=%d, title=%s, director=%s, year=%d, genre=%s, rating=%.1f]",
+                movieId, title, director, releaseYear, genre, rating
+        );
     }
 }

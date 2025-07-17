@@ -1,65 +1,49 @@
 <%--
-jessica long-heinicke 7.6.25 csd 430
-procesor for delete action
+jessica long-heinicke csd 430
+Created: 7.6.25
+Updated: 7.13.25
 --%>
 <%@ page import="beans.MovieBean" %>
-<%@ page import="java.util.List" %>
+<%@ page import="java.net.URLEncoder" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-  int movieId = Integer.parseInt(request.getParameter("movieId"));
-  boolean success = MovieBean.delete(movieId);
-  List<MovieBean> movies = MovieBean.getAllMovies();
+  // Get movie ID to delete
+  int movieId = 0;
+  String error = null;
+  String title = "";
+
+  try {
+    // Get movie ID from request
+    movieId = Integer.parseInt(request.getParameter("movieId"));
+
+    // Get movie details before deletion
+    MovieBean movie = MovieBean.getMovieById(movieId);
+    if (movie.getTitle() == null || movie.getTitle().isEmpty()) {
+      error = "Movie not found with ID: " + movieId;
+    } else {
+      title = movie.getTitle();
+
+      // Attempt deletion
+      boolean success = MovieBean.delete(movieId);
+      if (!success) {
+        error = "Database error occurred while deleting movie";
+      }
+    }
+  } catch (NumberFormatException e) {
+    error = "Invalid movie ID format: " + request.getParameter("movieId");
+  } catch (Exception e) {
+    error = "Unexpected error: " + e.getMessage();
+  }
+
+  // Prepare redirect parameters
+  String redirectParams = "";
+  if (error == null) {
+    redirectParams = "?success=true";
+  } else {
+    // Encode error message for URL
+    redirectParams = "?error=" + URLEncoder.encode(error, "UTF-8");
+  }
+
+  // Redirect back to selection page
+  response.sendRedirect("delete_selection.jsp" + redirectParams);
 %>
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Movie Deleted</title>
-  <style>
-    /* Same styles as create_processor.jsp */
-  </style>
-</head>
-<body>
-<div class="container">
-  <a href="delete.jsp" class="back-btn">Back to Delete</a>
-  <a href="index.jsp" class="back-btn">Home</a>
-
-  <% if (success) { %>
-  <div class="success">
-    <h2>Success!</h2>
-    <p>The movie has been deleted from the database.</p>
-  </div>
-  <% } else { %>
-  <div class="error">
-    <h2>Error</h2>
-    <p>Failed to delete the movie. Please try again.</p>
-  </div>
-  <% } %>
-
-  <h2>Updated Movie List</h2>
-  <table>
-    <thead>
-    <tr>
-      <th>ID</th>
-      <th>Title</th>
-      <th>Director</th>
-      <th>Year</th>
-      <th>Genre</th>
-      <th>Rating</th>
-    </tr>
-    </thead>
-    <tbody>
-    <% for (MovieBean movie : movies) { %>
-    <tr>
-      <td><%= movie.getMovieId() %></td>
-      <td><%= movie.getTitle() %></td>
-      <td><%= movie.getDirector() %></td>
-      <td><%= movie.getReleaseYear() %></td>
-      <td><%= movie.getGenre() %></td>
-      <td><%= String.format("%.1f", movie.getRating()) %></td>
-    </tr>
-    <% } %>
-    </tbody>
-  </table>
-</div>
-</body>
-</html>

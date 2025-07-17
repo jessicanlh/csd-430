@@ -33,7 +33,7 @@
         <li><a href="create.jsp">Add New Movie</a></li>
         <li><a href="read.jsp">View All Movies</a></li>
         <li><a href="update_selection.jsp">Update Movie Record</a></li> <!-- Updated link -->
-        <li><a href="delete.jsp">Delete Movie Record</a></li>
+        <li><a href="delete_selection.jsp">Delete Movie Record</a></li>
         <li><a href="select.jsp">View Movie by Selection</a></li>
     </ul>
 </div>
